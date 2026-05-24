@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>SYSTEM — Arjun</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a12;
+  --surface:#0f0f1a;
+  --card:#141420;
+  --card2:#191928;
+  --border:#1e1e30;
+  --border2:#252538;
+  --text:#e0e0f0;
+  --sub:#5a5a8a;
+  --sub2:#3a3a5a;
+  --accent:#5b7cfa;
+  --accent2:#4466e8;
+  --gold:#f0a030;
+  --green:#30c070;
+  --red:#e04040;
+  --purple:#9060e0;
+  --mono:'Share Tech Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;font-weight:500;min-height:100vh;max-width:480px;margin:0 auto;}
+
+/* ── HEADER ── */
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px 0;}
+.header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.sys-label{font-family:var(--mono);font-size:.55rem;color:var(--accent);letter-spacing:.2em;display:flex;align-items:center;gap:6px;}
+.sys-label::before,.sys-label::after{content:'✦';font-size:.5rem;}
+.date-label{font-family:var(--mono);font-size:.6rem;color:var(--sub);}
+
+.player-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.rank-avatar{width:52px;height:52px;background:var(--card2);border:2px solid var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;color:var(--accent);font-family:var(--mono);flex-shrink:0;position:relative;}
+.rank-avatar::after{content:attr(data-rank);position:absolute;bottom:-6px;right:-6px;font-size:.5rem;background:var(--accent);color:#000;font-family:var(--mono);padding:1px 4px;border-radius:3px;font-weight:700;}
+.player-info{flex:1;}
+.player-name{font-size:1.1rem;font-weight:700;color:var(--text);letter-spacing:.04em;}
+.player-sub{font-family:var(--mono);font-size:.58rem;color:var(--sub);letter-spacing:.1em;text-transform:uppercase;margin-top:1px;}
+.player-badges{display:flex;gap:6px;margin-top:6px;}
+.badge-pill{font-family:var(--mono);font-size:.58rem;padding:3px 8px;border-radius:20px;display:flex;align-items:center;gap:4px;}
+.badge-streak{background:rgba(240,160,48,.15);border:1px solid rgba(240,160,48,.3);color:var(--gold);}
+.badge-power{background:rgba(91,124,250,.15);border:1px solid rgba(91,124,250,.3);color:var(--accent);}
+
+.xp-section{margin-bottom:10px;}
+.xp-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.xp-rank-text{font-family:var(--mono);font-size:.6rem;color:var(--sub);}
+.xp-val{font-family:var(--mono);font-size:.62rem;color:var(--accent);font-weight:500;}
+.xp-bar-bg{height:5px;background:var(--border2);border-radius:3px;overflow:hidden;margin-bottom:6px;}
+.xp-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:3px;transition:width .5s ease;}
+.quest-progress-row{display:flex;justify-content:space-between;align-items:center;}
+.quest-dots{display:flex;gap:3px;flex:1;}
+.quest-dot{height:3px;border-radius:2px;background:var(--border2);flex:1;transition:background .3s;}
+.quest-dot.done{background:var(--accent);}
+.quest-pct{font-family:var(--mono);font-size:.6rem;color:var(--sub);margin-left:8px;}
+
+/* ── TABS ── */
+.tabs{display:flex;border-top:1px solid var(--border);margin-top:10px;}
+.tab{flex:1;padding:10px 0;text-align:center;font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* ── PANELS ── */
+.panel{display:none;padding:16px;}
+.panel.active{display:block;animation:fi .18s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── DAY SELECTOR ── */
+.day-selector{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;scrollbar-width:none;}
+.day-selector::-webkit-scrollbar{display:none;}
+.day-chip{font-family:var(--mono);font-size:.6rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;background:var(--card);border:1px solid var(--border);color:var(--sub);padding:6px 12px;border-radius:20px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;}
+.day-chip:hover{border-color:var(--border2);color:var(--text);}
+.day-chip.active{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700;}
+.day-chip.power{border-color:var(--purple);}
+.day-chip.power.active{background:var(--purple);border-color:var(--purple);}
+
+/* ── POWER ALERT ── */
+.power-alert{background:rgba(144,96,224,.08);border:1px solid rgba(144,96,224,.25);border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.pa-icon{font-size:1.1rem;}
+.pa-body{}
+.pa-title{font-size:.8rem;font-weight:700;color:#b090f0;}
+.pa-sub{font-family:var(--mono);font-size:.58rem;color:var(--sub);margin-top:1px;}
+
+/* ── SECTION HEADING ── */
+.section-head{font-family:var(--mono);font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--sub);margin:16px 0 10px;display:flex;align-items:center;gap:8px;}
+.section-head::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── QUEST ITEM ── */
+.quest-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;transition:all .2s;cursor:pointer;}
+.quest-item:hover{border-color:var(--border2);}
+.quest-item.done{opacity:.5;border-color:var(--border);}
+.quest-item.done .quest-title{text-decoration:line-through;color:var(--sub);}
+.quest-icon{font-size:1.3rem;width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--card2);border-radius:8px;flex-shrink:0;}
+.quest-body{flex:1;min-width:0;}
+.quest-title{font-size:.85rem;font-weight:600;color:var(--text);line-height:1.3;}
+.quest-detail{font-size:.7rem;color:var(--sub);margin-top:2px;line-height:1.4;display:none;}
+.quest-item.expanded .quest-detail{display:block;}
+.quest-tags{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap;}
+.quest-tag{font-family:var(--mono);font-size:.5rem;padding:2px 6px;border-radius:8px;background:var(--card2);color:var(--sub);border:1px solid var(--border);}
+.quest-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;}
+.quest-xp{font-family:var(--mono);font-size:.68rem;color:var(--green);font-weight:500;}
+.quest-circle{width:22px;height:22px;border-radius:50%;border:2px solid var(--border2);background:transparent;flex-shrink:0;transition:all .2s;display:flex;align-items:center;justify-content:center;}
+.quest-item.done .quest-circle{border-color:var(--accent);background:var(--accent);}
+.quest-circle-check{font-size:.6rem;color:#fff;display:none;}
+.quest-item.done .quest-circle-check{display:block;}
+
+/* ── RULE BANNER ── */
+.rule-banner{background:rgba(91,124,250,.06);border-left:2px solid var(--accent2);border-radius:0 6px 6px 0;padding:7px 10px;margin:6px 0;font-family:var(--mono);font-size:.6rem;color:var(--accent2);}
+
+/* ── STATS PANEL ── */
+.total-xp-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;margin-bottom:16px;}
+.total-xp-num{font-size:3rem;font-weight:700;color:var(--accent);line-height:1;font-family:var(--mono);}
+.total-xp-label{font-family:var(--mono);font-size:.6rem;color:var(--sub);letter-spacing:.15em;text-transform:uppercase;margin-top:4px;}
+.total-xp-streak{margin-top:8px;font-size:.75rem;color:var(--gold);}
+
+.attrs-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.attr-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;}
+.attr-icon{font-size:1.3rem;margin-bottom:4px;}
+.attr-label{font-family:var(--mono);font-size:.55rem;color:var(--sub);letter-spacing:.1em;text-transform:uppercase;}
+.attr-val{font-size:1.8rem;font-weight:700;line-height:1.1;margin:3px 0;}
+.attr-bar-bg{height:3px;background:var(--border2);border-radius:2px;overflow:hidden;margin-top:5px;}
+.attr-bar-fill{height:100%;border-radius:2px;transition:width .4s ease;}
+.attr-xp{font-family:var(--mono);font-size:.55rem;color:var(--sub2);margin-top:3px;}
+
+/* ── LOG PANEL ── */
+.week-map-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;}
+.week-map-days{display:flex;justify-content:space-between;gap:4px;}
+.wm-day{flex:1;text-align:center;}
+.wm-day-label{font-family:var(--mono);font-size:.5rem;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.wm-day-box{aspect-ratio:1;border-radius:4px;background:var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.6rem;font-weight:700;color:var(--sub2);transition:background .3s;}
+.wm-day-box.today{border:1px solid var(--accent);color:var(--accent);}
+.wm-caption{font-family:var(--mono);font-size:.55rem;color:var(--sub2);text-align:center;margin-top:8px;}
+
+.last7-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;}
+.last7-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);}
+.last7-row:last-child{border-bottom:none;}
+.last7-date{font-family:var(--mono);font-size:.62rem;color:var(--sub);width:48px;flex-shrink:0;}
+.last7-date.today{color:var(--accent);}
+.last7-bar-bg{flex:1;height:4px;background:var(--border2);border-radius:2px;overflow:hidden;}
+.last7-bar-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease;}
+.last7-pct{font-family:var(--mono);font-size:.6rem;color:var(--sub);width:30px;text-align:right;flex-shrink:0;}
+.last7-icon{font-size:.8rem;width:18px;text-align:right;flex-shrink:0;}
+
+/* ── REVIEW PANEL ── */
+.review-section-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;}
+.review-section-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.review-section-icon{font-size:1rem;}
+.review-section-title{font-size:.82rem;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.05em;}
+.review-q-block{margin-bottom:10px;}
+.review-q-label{font-family:var(--mono);font-size:.58rem;color:var(--sub);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;display:flex;justify-content:space-between;}
+.review-q-label span{color:var(--green);}
+.review-hint{font-size:.72rem;color:var(--sub);margin-bottom:5px;line-height:1.5;}
+.review-ta{width:100%;background:var(--card2);border:1px solid var(--border2);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:.8rem;padding:8px 10px;border-radius:8px;outline:none;resize:vertical;min-height:50px;line-height:1.5;transition:border-color .15s;}
+.review-ta:focus{border-color:var(--accent2);}
+.review-submit{width:100%;background:var(--accent2);border:none;color:#fff;font-family:'Rajdhani',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:12px;border-radius:10px;cursor:pointer;margin-top:4px;transition:opacity .15s;}
+.review-submit:hover{opacity:.85;}
+
+/* ── NOTIFICATION ── */
+#notif{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:9000;background:var(--card2);border:1px solid var(--accent2);border-radius:10px;padding:10px 16px;min-width:200px;max-width:360px;display:none;animation:notifIn .25s ease;box-shadow:0 4px 20px rgba(91,124,250,.2);}
+@keyframes notifIn{from{transform:translateX(-50%) translateY(-8px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+.notif-title{font-family:var(--mono);font-size:.55rem;color:var(--sub);letter-spacing:.1em;margin-bottom:2px;}
+.notif-msg{font-size:.82rem;font-weight:600;color:var(--text);}
+.notif-xp{font-family:var(--mono);font-size:.7rem;color:var(--green);margin-top:2px;}
+
+/* ── LEVEL UP ── */
+#levelup{position:fixed;inset:0;z-index:9500;background:rgba(10,10,18,.96);display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;}
+.lu-tag{font-family:var(--mono);font-size:.6rem;color:var(--sub);letter-spacing:.2em;}
+.lu-title{font-family:var(--mono);font-size:2.5rem;font-weight:700;color:var(--accent);letter-spacing:.1em;}
+.lu-msg{font-size:.88rem;color:var(--sub);font-weight:500;}
+.lu-btn{margin-top:16px;background:var(--accent2);border:none;color:#fff;font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;padding:10px 28px;border-radius:8px;cursor:pointer;}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* ── SECONDARY NAV (for more sections) ── */
+.more-nav{display:flex;gap:6px;overflow-x:auto;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);scrollbar-width:none;}
+.more-nav::-webkit-scrollbar{display:none;}
+.more-chip{font-family:var(--mono);font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;background:var(--card);border:1px solid var(--border);color:var(--sub);padding:5px 11px;border-radius:20px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;}
+.more-chip:hover{color:var(--text);}
+.more-chip.active{background:var(--card2);color:var(--text);border-color:var(--border2);}
+
+/* ── MORE PANELS ── */
+.more-panel{display:none;padding:16px;}
+.more-panel.active{display:block;animation:fi .18s ease;}
+
+/* skill cards */
+.skill-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s;}
+.skill-card:hover{border-color:var(--border2);}
+.skill-card.mastered{border-color:rgba(48,192,112,.3);}
+.sk-num{font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--accent);width:24px;flex-shrink:0;}
+.sk-body{flex:1;min-width:0;}
+.sk-name{font-size:.82rem;font-weight:700;color:var(--text);}
+.sk-phase{font-family:var(--mono);font-size:.52rem;color:var(--sub);text-transform:uppercase;letter-spacing:.08em;margin-top:1px;}
+.sk-practice{font-size:.7rem;color:var(--sub);margin-top:4px;line-height:1.4;}
+.sk-bar-bg{height:2px;background:var(--border2);border-radius:1px;overflow:hidden;margin-top:6px;}
+.sk-bar-fill{height:100%;background:var(--accent);border-radius:1px;transition:width .3s ease;}
+.sk-right{text-align:right;flex-shrink:0;}
+.sk-xp{font-family:var(--mono);font-size:.6rem;color:var(--green);}
+.sk-pct{font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--text);margin-top:3px;}
+.sk-tap{font-family:var(--mono);font-size:.48rem;color:var(--sub2);margin-top:1px;}
+
+/* rule cards */
+.rule-card{background:var(--card);border:1px solid var(--border);border-left:2px solid var(--accent2);border-radius:12px;padding:12px 14px;margin-bottom:8px;}
+.rule-title{font-family:var(--mono);font-size:.6rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;}
+.rule-body{font-size:.76rem;color:var(--sub);line-height:1.55;}
+.rule-body b{color:var(--text);font-weight:600;}
+
+/* table */
+.sys-table{width:100%;border-collapse:collapse;font-size:.72rem;}
+.sys-table th{font-family:var(--mono);font-size:.52rem;color:var(--sub2);padding:7px 8px;text-align:left;border-bottom:1px solid var(--border);letter-spacing:.1em;text-transform:uppercase;}
+.sys-table td{padding:9px 8px;border-bottom:1px solid var(--border);color:var(--sub);vertical-align:top;}
+.sys-table tr:last-child td{border-bottom:none;}
+.sys-table td:first-child{color:var(--text);font-weight:700;white-space:nowrap;}
+.tbadge{font-family:var(--mono);font-size:.5rem;padding:2px 5px;border-radius:6px;display:inline-block;margin:1px;}
+.bh{background:rgba(224,64,64,.15);color:#e08080;}
+.bm{background:rgba(240,160,48,.15);color:#e0b060;}
+.bl{background:rgba(48,192,112,.12);color:#60c090;}
+.bn{background:var(--card2);color:var(--sub2);}
+.bu{background:rgba(91,124,250,.15);color:#8090f0;}
+
+/* book cards */
+.book-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;}
+.bc-when{font-family:var(--mono);font-size:.58rem;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.bc-title{font-size:.84rem;font-weight:700;color:var(--text);}
+.bc-author{font-family:var(--mono);font-size:.56rem;color:var(--sub);margin-top:1px;}
+.bc-why{font-size:.72rem;color:var(--sub);margin-top:6px;line-height:1.5;}
+
+/* injury */
+.injury-alert{background:rgba(224,64,64,.06);border:1px solid rgba(224,64,64,.2);border-radius:12px;padding:14px;margin-bottom:10px;}
+.injury-alert-title{font-family:var(--mono);font-size:.6rem;color:var(--red);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;}
+.injury-alert-text{font-size:.74rem;color:var(--sub);line-height:1.7;}
+.injury-alert-text b{color:var(--text);}
+.drop-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;gap:12px;}
+.drop-n{font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--red);flex-shrink:0;line-height:1.2;}
+.drop-text{font-size:.75rem;color:var(--sub);line-height:1.55;}
+.drop-text b{color:var(--text);}
+
+/* ach */
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;}
+.ach-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;opacity:.25;transition:all .2s;}
+.ach-card.unlocked{opacity:1;border-color:rgba(91,124,250,.4);}
+.ach-icon{font-size:1.3rem;margin-bottom:4px;}
+.ach-name{font-size:.7rem;font-weight:700;color:var(--text);}
+.ach-desc{font-family:var(--mono);font-size:.52rem;color:var(--sub);margin-top:2px;}
+
+/* metric cards */
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.metric-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;}
+.mc-label{font-family:var(--mono);font-size:.55rem;color:var(--sub);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;}
+.mc-val{font-size:1.4rem;font-weight:700;color:var(--text);line-height:1;}
+.mc-target{font-family:var(--mono);font-size:.55rem;color:var(--sub2);margin-top:2px;}
+.mc-bar-bg{height:3px;background:var(--border2);border-radius:2px;overflow:hidden;margin:7px 0;}
+.mc-bar-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease;}
+.mc-input-row{display:flex;gap:5px;}
+.mc-input{flex:1;background:var(--card2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:.7rem;padding:5px 7px;border-radius:6px;outline:none;transition:border-color .15s;}
+.mc-input:focus{border-color:var(--accent2);}
+.mc-btn{font-family:var(--mono);font-size:.58rem;font-weight:500;background:var(--accent2);border:none;color:#fff;padding:5px 10px;border-radius:6px;cursor:pointer;white-space:nowrap;}
+
+/* rank display */
+.rank-display-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;}
+.rank-big{font-family:var(--mono);font-size:2.5rem;font-weight:700;color:var(--accent);line-height:1;width:52px;flex-shrink:0;text-align:center;}
+.rank-info-name{font-size:.9rem;font-weight:700;color:var(--text);}
+.rank-info-desc{font-size:.72rem;color:var(--sub);margin-top:4px;line-height:1.4;}
+.rank-thresholds{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;}
+.rank-thresh-title{font-family:var(--mono);font-size:.58rem;color:var(--sub);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;}
+.rank-thresh-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);}
+.rank-thresh-row:last-child{border-bottom:none;}
+.rt-rank{font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--text);}
+.rt-name{font-family:var(--mono);font-size:.62rem;color:var(--sub);}
+.rt-xp{font-family:var(--mono);font-size:.62rem;color:var(--accent);}
+</style>
+</head>
+<body>
+
+<!-- LEVEL UP -->
+<div id="levelup">
+  <div class="lu-tag">— SYSTEM ALERT —</div>
+  <div class="lu-title">LEVEL UP</div>
+  <div class="lu-msg" id="lu-msg">You have grown stronger.</div>
+  <button class="lu-btn" onclick="document.getElementById('levelup').style.display='none'">CONTINUE</button>
+</div>
+
+<!-- NOTIFICATION -->
+<div id="notif">
+  <div class="notif-title">SYSTEM</div>
+  <div class="notif-msg" id="notif-msg"></div>
+  <div class="notif-xp" id="notif-xp"></div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div class="sys-label">SOLO LEVELING SYSTEM</div>
+    <div class="date-label" id="date-label"></div>
+  </div>
+  <div class="player-row">
+    <div class="rank-avatar" id="rank-avatar" data-rank="E">E</div>
+    <div class="player-info">
+      <div class="player-name">Arjun — Hunter</div>
+      <div class="player-sub">Nexflow Automations · Nagpur</div>
+      <div class="player-badges">
+        <div class="badge-pill badge-streak">🔥 <span id="streak-val">0</span> day streak</div>
+        <div class="badge-pill badge-power" id="power-badge" style="display:none">⚡ Power Day</div>
+      </div>
+    </div>
+  </div>
+  <div class="xp-section">
+    <div class="xp-row">
+      <span class="xp-rank-text">Rank <span id="rank-progress-text">E → D</span></span>
+      <span class="xp-val" id="xp-val-display">0 / 1000 XP</span>
+    </div>
+    <div class="xp-bar-bg"><div class="xp-bar-fill" id="xp-bar" style="width:0%"></div></div>
+    <div class="quest-progress-row">
+      <div class="quest-dots" id="quest-dots"></div>
+      <div class="quest-pct" id="quest-pct">0%</div>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('quests',this)">✕ QUESTS</div>
+    <div class="tab" onclick="showTab('stats',this)">📊 STATS</div>
+    <div class="tab" onclick="showTab('nutrition',this)">🥗 FOOD</div>
+    <div class="tab" onclick="showTab('log',this)">📋 LOG</div>
+    <div class="tab" onclick="showTab('more',this)">⊞ MORE</div>
+  </div>
+</div>
+
+<!-- QUESTS PANEL -->
+<div class="panel active" id="panel-quests">
+  <div class="day-selector">
+    <div class="day-chip active" onclick="showDay('mon',this)">Mon</div>
+    <div class="day-chip power" onclick="showDay('tue',this)">Tue ⚡</div>
+    <div class="day-chip" onclick="showDay('wed',this)">Wed</div>
+    <div class="day-chip power" onclick="showDay('thu',this)">Thu ⚡</div>
+    <div class="day-chip" onclick="showDay('fri',this)">Fri</div>
+    <div class="day-chip" onclick="showDay('sat',this)">Sat</div>
+    <div class="day-chip" onclick="showDay('sun',this)">Sun</div>
+  </div>
+  <div id="quest-list"></div>
+</div>
+
+<!-- STATS PANEL -->
+<div class="panel" id="panel-stats">
+  <div class="total-xp-card">
+    <div class="total-xp-num" id="total-xp-display">0</div>
+    <div class="total-xp-label">Total XP Earned</div>
+    <div class="total-xp-streak">🔥 <span id="streak-stats">0</span> day streak</div>
+  </div>
+  <div class="section-head">Attributes</div>
+  <div class="attrs-grid" id="attrs-grid"></div>
+  <div class="section-head">Weekly Metrics</div>
+  <div class="metric-grid" id="metric-grid"></div>
+</div>
+
+<!-- LOG PANEL -->
+<div class="panel" id="panel-log">
+  <div class="section-head">7-Day Quest Map</div>
+  <div class="week-map-card">
+    <div class="week-map-days" id="week-map"></div>
+    <div class="wm-caption">Quests done per day · darker = more complete</div>
+  </div>
+  <div class="section-head">Last 7 Days</div>
+  <div class="last7-card" id="last7"></div>
+  <div class="section-head">Sunday Review</div>
+  <div id="review-form-log"></div>
+  <button class="review-submit" onclick="submitReview()">Submit Review — Claim XP</button>
+</div>
+
+<!-- MORE PANEL -->
+<div class="panel" id="panel-more">
+  <div class="more-nav" id="more-nav" style="margin:-16px -16px 16px;padding:12px 16px;">
+    <div class="more-chip active" onclick="showMore('skills',this)">Skill Tree</div>
+    <div class="more-chip" onclick="showMore('split',this)">Training Split</div>
+    <div class="more-chip" onclick="showMore('rules',this)">Core Rules</div>
+    <div class="more-chip" onclick="showMore('reading',this)">Reading List</div>
+    <div class="more-chip" onclick="showMore('injury',this)">Injury Protocol</div>
+    <div class="more-chip" onclick="showMore('rank',this)">Rank & Achievements</div>
+  </div>
+  <div class="more-panel active" id="more-skills"><div id="skill-list"></div></div>
+  <div class="more-panel" id="more-split">
+    <div class="section-head">Weekly Training Split</div>
+    <div style="overflow-x:auto;"><table class="sys-table">
+      <thead><tr><th>Day</th><th>Gym</th><th>Outdoor</th><th>Indoor</th><th>Eve Gym</th></tr></thead>
+      <tbody>
+        <tr><td>Mon</td><td><span class="tbadge bh">Hard</span> Squat</td><td><span class="tbadge bh">Hard</span> Sprints</td><td>Hard 2pm</td><td><span class="tbadge bu">Upper</span></td></tr>
+        <tr><td>Tue ⚡</td><td><span class="tbadge bm">Mod</span> RDL</td><td><span class="tbadge bm">Mod</span> Footwork</td><td>Ends 12:30</td><td><span class="tbadge bn">None</span></td></tr>
+        <tr><td>Wed</td><td><span class="tbadge bh">Hard</span> Squat</td><td><span class="tbadge bh">Hard</span> COD</td><td>Matchplay</td><td><span class="tbadge bu">Upper</span></td></tr>
+        <tr><td>Thu ⚡</td><td><span class="tbadge bl">Light</span> Mob</td><td><span class="tbadge bl">Light</span> Walk</td><td>Ends 12:30</td><td><span class="tbadge bn">None</span></td></tr>
+        <tr><td>Fri</td><td><span class="tbadge bh">Hard</span> Hip</td><td><span class="tbadge bh">Hard</span> Reactive</td><td>Hard 2pm</td><td><span class="tbadge bu">Upper</span></td></tr>
+        <tr><td>Sat</td><td><span class="tbadge bm">Mod</span> Maint</td><td><span class="tbadge bm">Mod</span> Activation</td><td>Skill</td><td><span class="tbadge bn">None</span></td></tr>
+        <tr><td>Sun</td><td><span class="tbadge bn">Rest</span></td><td><span class="tbadge bn">Rest</span></td><td>Rest</td><td><span class="tbadge bn">None</span></td></tr>
+      </tbody>
+    </table></div>
+    <div class="section-head">Afternoon Rotation</div>
+    <div style="overflow-x:auto;"><table class="sys-table">
+      <thead><tr><th>Day</th><th>Start</th><th>Primary (2H)</th><th>Secondary</th></tr></thead>
+      <tbody>
+        <tr><td>Mon</td><td>3:30pm</td><td>n8n build — 1 feature. Ship.</td><td>Read + 3 insights</td></tr>
+        <tr><td>Tue ⚡</td><td>2:00pm</td><td>Factory visit / major build / English</td><td>MIDC research + LinkedIn</td></tr>
+        <tr><td>Wed</td><td>3:30pm</td><td>English — write + pitch aloud</td><td>Book chapter + insights</td></tr>
+        <tr><td>Thu ⚡</td><td>2:00pm</td><td>Deep MIDC research — 5 findings</td><td>Reading + 5 LinkedIn connections</td></tr>
+        <tr><td>Fri</td><td>3:30pm</td><td>Finish n8n. Deploy. Weekly review.</td><td>Monday prep</td></tr>
+        <tr><td>Sat</td><td>3:30pm</td><td>Strategy + LinkedIn post</td><td>Prep Sunday review</td></tr>
+        <tr><td>Sun</td><td>—</td><td>Complete rest</td><td>Sunday Review only</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="more-panel" id="more-rules">
+    <div class="rule-card"><div class="rule-title">Rule 0 — Sleep</div><div class="rule-body"><b>9:30pm–6:00am every night.</b> Speed, cognition, muscle, mood — all depend on this. No exceptions. Ever.</div></div>
+    <div class="rule-card"><div class="rule-title">Write Before You Act</div><div class="rule-body">1 goal every morning. 1 goal every session. Review every night. On paper.</div></div>
+    <div class="rule-card"><div class="rule-title">Power Blocks Are Sacred</div><div class="rule-body"><b>Tue + Thu 2–8pm.</b> Tell family. No hangouts. First revenue comes from here.</div></div>
+    <div class="rule-card"><div class="rule-title">Never Cancel Badminton</div><div class="rule-body">Gym can be skipped. Badminton cannot. It is your discipline engine.</div></div>
+    <div class="rule-card"><div class="rule-title">Factory Visits Override Gym — Never Badminton</div><div class="rule-body">Gym skipped max once per week. Revenue beats fitness within reason.</div></div>
+    <div class="rule-card"><div class="rule-title">Sunday = Complete Recovery</div><div class="rule-body">No training, no structured business. This is strategy, not laziness.</div></div>
+    <div class="rule-card"><div class="rule-title">Track Numbers, Not Feelings</div><div class="rule-body">Feelings lie. Numbers don't. Measure weekly in Google Sheet.</div></div>
+    <div class="rule-card"><div class="rule-title">English — Every Single Day</div><div class="rule-body">1 paragraph, every day. No days off. 8 minutes. In 6 months you will be unrecognisable.</div></div>
+    <div class="rule-card"><div class="rule-title">Month 1 — 10–15 Factory Conversations</div><div class="rule-body">Walk MIDC. Knock on doors. Call warm contacts. Month 2+ normalises to 5/month.</div></div>
+  </div>
+  <div class="more-panel" id="more-reading">
+    <div class="book-card"><div class="bc-when">Now</div><div class="bc-title">Millionaire Fastlane</div><div class="bc-author">MJ DeMarco</div><div class="bc-why">Your business bible. CENTS framework explains exactly why your MIDC SaaS model works. Read it like a manual.</div></div>
+    <div class="book-card"><div class="bc-when">Next</div><div class="bc-title">How to Win Friends</div><div class="bc-author">Dale Carnegie</div><div class="bc-why">Sales and communication foundation. Practice 1 technique per week with real people.</div></div>
+    <div class="book-card"><div class="bc-when">After 1st client</div><div class="bc-title">Atomic Habits</div><div class="bc-author">James Clear</div><div class="bc-why">Locks in this routine so it survives tournament weeks and slow business periods.</div></div>
+    <div class="book-card"><div class="bc-when">After 3 clients</div><div class="bc-title">Zero to One</div><div class="bc-author">Peter Thiel</div><div class="bc-why">Changes how you think about building something unique vs copying.</div></div>
+    <div class="book-card"><div class="bc-when">Month 6+</div><div class="bc-title">Never Split the Difference</div><div class="bc-author">Chris Voss</div><div class="bc-why">Negotiation for closing factory clients. Read before every big meeting.</div></div>
+  </div>
+  <div class="more-panel" id="more-injury">
+    <div class="injury-alert">
+      <div class="injury-alert-title">Signals — Act Immediately</div>
+      <div class="injury-alert-text">· Sharp joint pain (not muscle burn)<br>· Soreness >48 hrs not resolving<br>· Energy score &lt;5 for 3+ days<br>· Any knee, shoulder, ankle swelling<br><br><b>Push through muscle fatigue. Never push through joint signals.</b></div>
+    </div>
+    <div class="section-head">Drop Order</div>
+    <div class="drop-card"><div class="drop-n">1</div><div class="drop-text"><b>Evening gym</b> — first to go. Lowest badminton value, highest recovery cost.</div></div>
+    <div class="drop-card"><div class="drop-n">2</div><div class="drop-text"><b>Morning gym</b> — drop to light mobility only.</div></div>
+    <div class="drop-card"><div class="drop-n">3</div><div class="drop-text"><b>Outdoor work</b> — replace with shadow footwork at 50% intensity.</div></div>
+    <div class="drop-card"><div class="drop-n">4</div><div class="drop-text"><b>Indoor badminton</b> — drills only, no matchplay. Last to go.</div></div>
+    <div class="drop-card" style="border-color:rgba(91,124,250,.3)"><div class="drop-n" style="color:var(--accent)">✓</div><div class="drop-text"><b style="color:var(--text)">Never cancel deep work or business for injury.</b></div></div>
+    <div class="section-head">Return Protocol</div>
+    <div class="rule-card"><div class="rule-title">Mandatory Rest</div><div class="rule-body">Two consecutive energy scores of 4 or below = <b>full rest day next day.</b></div></div>
+    <div class="rule-card"><div class="rule-title">Return</div><div class="rule-body"><b>70% intensity first session back.</b> Full only on second. Pain returns = two more rest days.</div></div>
+    <div class="rule-card"><div class="rule-title">Tournament Weeks</div><div class="rule-body"><b>Cancel all gym 3 days before.</b> No matchplay after Day -2. Sleep is the priority.</div></div>
+  </div>
+  <div class="more-panel" id="more-rank">
+    <div class="rank-display-card">
+      <div class="rank-big" id="rank-big">E</div>
+      <div><div class="rank-info-name" id="rank-info-name">Novice</div><div class="rank-info-desc" id="rank-info-desc">Beginning of the journey. Every legend starts here.</div></div>
+    </div>
+    <div class="rank-thresholds">
+      <div class="rank-thresh-title">Rank Thresholds</div>
+      <div class="rank-thresh-row"><div class="rt-rank">E</div><div class="rt-name">Novice</div><div class="rt-xp">0 XP</div></div>
+      <div class="rank-thresh-row"><div class="rt-rank">D</div><div class="rt-name">Disciplined</div><div class="rt-xp">1,000 XP</div></div>
+      <div class="rank-thresh-row"><div class="rt-rank">C</div><div class="rt-name">Consistent</div><div class="rt-xp">5,000 XP</div></div>
+      <div class="rank-thresh-row"><div class="rt-rank">B</div><div class="rt-name">Builder</div><div class="rt-xp">15,000 XP</div></div>
+      <div class="rank-thresh-row"><div class="rt-rank">A</div><div class="rt-name">Operator</div><div class="rt-xp">35,000 XP</div></div>
+      <div class="rank-thresh-row"><div class="rt-rank">S</div><div class="rt-name">Elite</div><div class="rt-xp">75,000 XP</div></div>
+      <div class="rank-thresh-row"><div class="rt-rank">SS</div><div class="rt-name">Shadow Monarch</div><div class="rt-xp">150,000 XP</div></div>
+    </div>
+    <div class="section-head" style="margin-top:16px;">Achievements</div>
+    <div class="ach-grid" id="ach-grid"></div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────
+// DATA
+// ─────────────────────────────
+const DAYS={
+  mon:{label:'Monday',power:false,sections:[
+    {head:'MORNING GATES',quests:[
+      {icon:'💧',title:'Wake + Hydrate 500ml',detail:'No phone for first 10 min.',tags:['Sleep','Focus'],xp:10},
+      {icon:'📝',title:'Write today\'s 2 goals on paper',detail:'1 badminton goal + 1 business goal. On paper, not phone.',tags:['Focus','Business'],xp:15},
+    ]},
+    {head:'ATHLETIC BLOCK',quests:[
+      {icon:'🏋️',title:'Morning Gym — Lower body + Explosiveness',detail:'Goblet Squat 4×5 + Jump Squat 4×3 · Hip Thrust 3×8 · Bulgarian Split Squat 3×6 · Nordic Curl Neg 3×5 · Banded Walks 2×12 · Calf Raise 3×12. No failure sets.',tags:['Badminton'],xp:40,rule:'No failure sets — prime the CNS, don\'t destroy it.'},
+      {icon:'🏸',title:'Outdoor — Sprints + Broad Jumps',detail:'Warm-up 8 min → 10m ×6 (90s) → 15m ×6 badminton start → 20m ×4 (2 min) → Broad Jumps 4×4 → Plank 3×40s + Ab Wheel 3×8.',tags:['Badminton'],xp:50,rule:'Stop the moment sprint quality drops.'},
+      {icon:'⚡',title:'Indoor Badminton — Technical + Matchplay',detail:'First 30 min: drills only. Shadow footwork 10×15s. Multi-shuttle feeds. Middle: full matchplay. Last 20 min: weakest shot ×100 slow reps.',tags:['Badminton'],xp:60},
+    ]},
+    {head:'RECOVERY',quests:[
+      {icon:'🍚',title:'Recovery Meal — High carb + protein',detail:'Rice/roti + dal + chicken/eggs within 30 min of finishing. Do not skip.',tags:['Badminton'],xp:15},
+      {icon:'😴',title:'Recovery Nap 30–45 min',detail:'Muscles rebuild here. Morning skills consolidate. Non-negotiable.',tags:['Sleep','Badminton'],xp:20},
+    ]},
+    {head:'DEEP WORK',quests:[
+      {icon:'💻',title:'n8n Build — 2 hours',detail:'Phone face down. No lyrics. One task only. Build 1 feature. Write goal before opening anything.',tags:['Business'],xp:60,rule:'This block does not get compromised. Not for anything.'},
+      {icon:'📚',title:'Read + Write 3 Key Insights',detail:'Read current book. Write 3 key insights after the session.',tags:['Focus'],xp:20},
+    ]},
+    {head:'EVENING',quests:[
+      {icon:'💪',title:'Evening Gym — Upper Body',detail:'Pull-ups 4×6–8 · DB Row 3×10 · Push-ups slow eccentric 3×12 · Face Pulls 3×15 · Wrist Roller 2×10. Skip if energy below 6.',tags:['Badminton'],xp:30},
+      {icon:'🌙',title:'Journal + Prep Tomorrow',detail:'3 things done · 1 thing to fix · energy 1–10. Prepare clothes and bag.',tags:['Focus'],xp:10},
+      {icon:'😴',title:'Sleep by 9:30pm',detail:'Rule Zero. 8.5 hours. Speed, cognition, muscle — all depend on this. No exceptions.',tags:['Sleep'],xp:10},
+    ]},
+  ]},
+  tue:{label:'Tuesday ⚡ Power Day',power:true,sections:[
+    {head:'MORNING GATES',quests:[
+      {icon:'💧',title:'Wake + Hydrate 500ml',detail:'No phone 10 min. 1 goal each. Banana before gym.',tags:['Sleep','Focus'],xp:10},
+      {icon:'📝',title:'Write today\'s 2 goals',detail:'Power Day goal must be your most important task of the week.',tags:['Focus','Business'],xp:15},
+    ]},
+    {head:'ATHLETIC BLOCK',quests:[
+      {icon:'🏋️',title:'Morning Gym — RDL + Posterior Chain',detail:'RDL 4×6 · Single Leg RDL 3×8 · Leg Press 3×10 · Nordic Curl Neg 3×5 · Single Leg Calf 3×12. Moderate — preserve energy.',tags:['Badminton'],xp:35},
+      {icon:'🏃',title:'Outdoor — Footwork + Movement Quality',detail:'Agility ladder 5× · Lateral shuffle 5× · 5-point star cones 3×5 · Band walks 3×15m · Lateral Bounds 4×6 · Core: Pallof Press + Dead Bug.',tags:['Badminton'],xp:35,rule:'Quality of movement, not speed.'},
+      {icon:'⚡',title:'Indoor Badminton — Technical Focus (ENDS 12:30)',detail:'Drills first 30 min. Slow shadow footwork 10×20s. Net play precision 30 min. 70% pace games. ENDS 12:30 SHARP.',tags:['Badminton'],xp:50},
+    ]},
+    {head:'RECOVERY',quests:[
+      {icon:'🍚',title:'Recovery Meal',detail:'Rice + dal + chicken/eggs. You\'re about to run a 6-hour brain session — fuel it.',tags:['Badminton'],xp:15},
+      {icon:'😴',title:'Nap — Full Hour',detail:'Non-negotiable. Power block starts in 1 hour. Sleep now or underperform then.',tags:['Sleep'],xp:20},
+    ]},
+    {head:'POWER BLOCK (2–8PM)',quests:[
+      {icon:'🏭',title:'Factory Visit OR Major Build OR Deep English',detail:'Write goal on paper. Phone down. One task. Factory: go. n8n: biggest feature. English: 45 min write + 45 min pitch aloud.',tags:['Business'],xp:100,rule:'This is where first revenue comes from. Guard it.'},
+      {icon:'🔍',title:'MIDC Research + LinkedIn Outreach',detail:'Research Butibori/Hingna pain points. Write 5 key findings. LinkedIn: 5 personal connection requests.',tags:['Business'],xp:50},
+    ]},
+    {head:'EVENING',quests:[
+      {icon:'🌙',title:'Journal + Prep Tomorrow',detail:'3 done · 1 fix · energy 1–10.',tags:['Focus'],xp:10},
+      {icon:'😴',title:'Sleep by 9:30pm',detail:'Rule Zero. No gym tonight — Tuesday is a no-gym day.',tags:['Sleep'],xp:10},
+    ]},
+  ]},
+  wed:{label:'Wednesday',power:false,sections:[
+    {head:'MORNING GATES',quests:[
+      {icon:'💧',title:'Wake + Hydrate 500ml',detail:'No phone 10 min. 1 goal each.',tags:['Sleep','Focus'],xp:10},
+      {icon:'📝',title:'Write today\'s 2 goals',tags:['Focus'],xp:15},
+    ]},
+    {head:'ATHLETIC BLOCK',quests:[
+      {icon:'🏋️',title:'Morning Gym — Back Squat + Lunge',detail:'Back Squat 4×5 + Box Jump 4×3 (contrast) · Walking Lunge 3×10 · Step-Up 3×8 · Tibialis Raise 3×15. Heaviest squat day.',tags:['Badminton'],xp:40,rule:'Log your squat weight every single week.'},
+      {icon:'🏃',title:'Outdoor — Deceleration + COD',detail:'10m Sprint → hard stop ×6 · T-Drill ×6 — TIME + LOG · 5-10-5 Shuttle ×6 — TIME + LOG · Depth Drop → 5m Sprint 4×5.',tags:['Badminton'],xp:50,rule:'T-drill and 5-10-5 times written down every week.'},
+      {icon:'⚡',title:'Indoor Badminton — High Intensity Matchplay',detail:'Shadow footwork max 12×15s — count steps. Rear court pressure drill 4×3 min. Full competitive matchplay. Last 20 min: weakest shot.',tags:['Badminton'],xp:60},
+    ]},
+    {head:'RECOVERY',quests:[
+      {icon:'🍚',title:'Recovery Meal',tags:['Badminton'],xp:15},
+      {icon:'😴',title:'Recovery Nap',tags:['Sleep','Badminton'],xp:20},
+    ]},
+    {head:'DEEP WORK',quests:[
+      {icon:'✍️',title:'English Writing + Communication — 2 hours',detail:'45 min write — 1 paragraph, rewrite 3–4× until sharp. 45 min speak — pitch aloud in English then Marathi.',tags:['English'],xp:60,rule:'Marathi pitch: 5× repetition minimum. Your weakest area.'},
+      {icon:'📚',title:'Book Chapter + Write Insights',tags:['Focus'],xp:20},
+    ]},
+    {head:'EVENING',quests:[
+      {icon:'💪',title:'Evening Gym — Upper Body Push + Arms',detail:'Incline DB Press 4×8 · Cable Fly 3×12 · Curl 3×12 · Tricep Pushdown 3×12 · Band Pull-Apart 2×20.',tags:['Badminton'],xp:30},
+      {icon:'🌙',title:'Journal + Prep Tomorrow',tags:['Focus'],xp:10},
+      {icon:'😴',title:'Sleep by 9:30pm',tags:['Sleep'],xp:10},
+    ]},
+  ]},
+  thu:{label:'Thursday ⚡ Power Day',power:true,sections:[
+    {head:'MORNING GATES',quests:[
+      {icon:'💧',title:'Wake + Hydrate 500ml',tags:['Sleep','Focus'],xp:10},
+      {icon:'📝',title:'Write today\'s 2 goals',tags:['Focus','Business'],xp:15},
+    ]},
+    {head:'ATHLETIC BLOCK',quests:[
+      {icon:'🧘',title:'Morning Mobility — Foam Roll + Stretch (30 min)',detail:'Foam roll quads/hamstrings/calves/upper back 10 min · Hip 90/90 90s each · Hip flexor · Thoracic rotation · Shoulder · Ankle. No heavy lifting.',tags:['Badminton'],xp:20,rule:'Thursday morning is recovery. Not training.'},
+      {icon:'🚶',title:'Outdoor — Light Footwork Only',detail:'Easy agility ladder ×4. Light cone shuffles 3 rounds. Easy 15 min walk. No sprints. No plyos.',tags:['Badminton'],xp:15},
+      {icon:'⚡',title:'Indoor Badminton — Technical Light (ENDS 12:30)',detail:'Slow shadow footwork 6×20s. Gentle rally 30 min. 1 shot ×100 slow reps — fix weakest shot. ENDS 12:30 SHARP.',tags:['Badminton'],xp:40},
+    ]},
+    {head:'RECOVERY',quests:[
+      {icon:'🍚',title:'Recovery Meal',tags:['Badminton'],xp:15},
+      {icon:'😴',title:'Nap — Full Hour',detail:'Non-negotiable before power block.',tags:['Sleep'],xp:20},
+    ]},
+    {head:'POWER BLOCK (2–8PM)',quests:[
+      {icon:'🔍',title:'Deep MIDC Research',detail:'Research Butibori, Hingna clusters. Write 5 key findings before ending. What problems do ₹35L/month factory owners have?',tags:['Business'],xp:80,rule:'5 written findings before closing this task.'},
+      {icon:'📖',title:'Reading + LinkedIn 5 Connections',detail:'20 pages min. Write 3 sentences per chapter. LinkedIn: 5 connections with personal notes — reference something specific.',tags:['Focus','Business'],xp:50},
+    ]},
+    {head:'EVENING',quests:[
+      {icon:'🌙',title:'Journal + Prep Tomorrow',tags:['Focus'],xp:10},
+      {icon:'😴',title:'Sleep by 9:30pm',detail:'No gym tonight. Thursday is a no-gym day.',tags:['Sleep'],xp:10},
+    ]},
+  ]},
+  fri:{label:'Friday',power:false,sections:[
+    {head:'MORNING GATES',quests:[
+      {icon:'💧',title:'Wake + Hydrate 500ml',tags:['Sleep','Focus'],xp:10},
+      {icon:'📝',title:'Write today\'s 2 goals',tags:['Focus','Business'],xp:15},
+    ]},
+    {head:'ATHLETIC BLOCK',quests:[
+      {icon:'🏋️',title:'Morning Gym — Hip Thrust + Reactive',detail:'Hip Thrust heavy 4×6 · Banded Hip Thrust explosive 3×8 · Lateral Lunge DB 3×8 · Cable Pull-Through 3×10 · Single Leg Calf 3×12.',tags:['Badminton'],xp:40},
+      {icon:'⚡',title:'Outdoor — Reactive Speed + Pogo Hops',detail:'Partner reaction drill 5×8 · 3-cone random shuttle 6×6 · Flying 10m ×4 · Pogo Hops 4×15 · Single Leg Pogo 3×10 · Suitcase Carry 3×20m + Hollow Body 3×30s.',tags:['Badminton'],xp:50,rule:'Pogo hops: stiff ankles, minimal knee bend. Most important drill for court foot speed.'},
+      {icon:'🏸',title:'Indoor Badminton — Match Intensity',detail:'Reactive shadow footwork 10×15s (30s rest). Full competitive games — play to win. Last 20 min: weakest shot.',tags:['Badminton'],xp:60},
+    ]},
+    {head:'RECOVERY',quests:[
+      {icon:'🍚',title:'Recovery Meal',tags:['Badminton'],xp:15},
+      {icon:'😴',title:'Recovery Nap',tags:['Sleep','Badminton'],xp:20},
+    ]},
+    {head:'DEEP WORK',quests:[
+      {icon:'🚀',title:'Build + Deploy + Weekly Review',detail:'Finish week\'s n8n build. Make it demo-ready. Deploy if possible. What shipped? What blocked? Monday goal?',tags:['Business'],xp:60},
+      {icon:'📋',title:'Weekly Review + Monday Prep',detail:'Update n8n context block. Set Monday\'s primary goal clearly.',tags:['Business'],xp:20},
+    ]},
+    {head:'EVENING',quests:[
+      {icon:'💪',title:'Evening Gym — Full Body Light',detail:'Pull-Ups 3×6 · Incline DB Press 3×10 · Face Pull 3×15 · Hanging Knee Raise 3×12. 2 reps in tank every set.',tags:['Badminton'],xp:25},
+      {icon:'🌙',title:'Journal + Weekend Prep',tags:['Focus'],xp:10},
+      {icon:'😴',title:'Sleep by 9:30pm',tags:['Sleep'],xp:10},
+    ]},
+  ]},
+  sat:{label:'Saturday',power:false,sections:[
+    {head:'MORNING GATES',quests:[
+      {icon:'💧',title:'Wake + Hydrate 500ml',tags:['Sleep','Focus'],xp:10},
+      {icon:'📝',title:'Write today\'s 2 goals',tags:['Focus'],xp:15},
+    ]},
+    {head:'ATHLETIC BLOCK',quests:[
+      {icon:'🏋️',title:'Morning Gym — Maintenance Only (30–40 min)',detail:'Goblet Squat 3×6 (moderate, 2 reps in tank) · Hip Thrust 3×8 light · Nordic Curl Neg 2×4. Preserve energy for badminton.',tags:['Badminton'],xp:25},
+      {icon:'🚶',title:'Outdoor — Light Footwork Activation',detail:'Easy agility ladder ×4. Light cone shuffles 3 rounds. Warming feet up — not a workout.',tags:['Badminton'],xp:15},
+      {icon:'🏸',title:'Indoor Badminton — Skill Emphasis',detail:'Serve + return 30 min. Coach-assigned drills 45 min. Match play — strategy focus. Think during games. Identify opponent patterns.',tags:['Badminton'],xp:65},
+    ]},
+    {head:'RECOVERY',quests:[
+      {icon:'🍚',title:'Recovery Meal',tags:['Badminton'],xp:15},
+      {icon:'😴',title:'Recovery Nap',tags:['Sleep','Badminton'],xp:20},
+    ]},
+    {head:'WORK BLOCK',quests:[
+      {icon:'📊',title:'Strategy Review + LinkedIn Post',detail:'Strategy review 30 min. Write + publish 1 LinkedIn post. Plan next week\'s 1 business goal. Update n8n context. Prep Sunday review.',tags:['Business'],xp:40},
+    ]},
+    {head:'EVENING',quests:[
+      {icon:'🌙',title:'Journal + Sunday Prep',detail:'Prepare Sunday review template.',tags:['Focus'],xp:10},
+      {icon:'😴',title:'Sleep by 9:30pm',detail:'No gym tonight.',tags:['Sleep'],xp:10},
+    ]},
+  ]},
+  sun:{label:'Sunday — Rest Day',power:false,sections:[
+    {head:'REST & RECOVERY',quests:[
+      {icon:'😴',title:'Sleep in — No Alarm',detail:'Growth hormone peaks during deep sleep. This is where you get stronger.',tags:['Sleep'],xp:30},
+      {icon:'🚶',title:'20 min Walk + Family Breakfast',detail:'Light walk. Family breakfast — no screens. Fully decompress.',tags:['Focus'],xp:20},
+      {icon:'🧘',title:'Full Body Stretch + Foam Roll (30 min)',detail:'Quads, hip flexors, hamstrings, calves, chest, shoulders. 60–90s each. Foam roll 10 min.',tags:['Badminton'],xp:30},
+      {icon:'📖',title:'Read Freely — No Structure',detail:'No pressure. No notes required. Read what you want.',tags:['Focus'],xp:20},
+    ]},
+    {head:'SUNDAY REVIEW',quests:[
+      {icon:'📋',title:'Complete Weekly Review (30 min max)',detail:'See the LOG tab → Sunday Review section. Then fully disconnect. Trust the system.',tags:['Business','Focus'],xp:100},
+      {icon:'😴',title:'Sleep by 9:30pm',detail:'9:30pm even on Sunday. Wake 6:00am Monday ready.',tags:['Sleep'],xp:10},
+    ]},
+  ]},
+};
+
+const SKILLS=[
+  {n:1,name:'English Fluency + Writing',phase:'NOW',practice:'1 paragraph every day. Record speaking 2 min once/week.',xp:50},
+  {n:2,name:'Communication + Persuasion',phase:'NOW',practice:'Full pitch aloud 3×/week. Write what worked after every conversation.',xp:60},
+  {n:3,name:'n8n + Building',phase:'NOW',practice:'Build Mon/Wed/Fri. Ship 1 thing per week, however small.',xp:70},
+  {n:4,name:'Hindi + Marathi Pitch',phase:'NOW',practice:'Full Hindi pitch once/week. 10 Marathi factory terms/month.',xp:50},
+  {n:5,name:'Client Finding + Intel',phase:'NOW',practice:'Month 1: 10–15 factory conversations. Month 2+: 5/month.',xp:80},
+  {n:6,name:'Sales + Negotiation',phase:'Month 2+',practice:'Role-play every meeting 30 min before. 3 objections + response.',xp:70},
+  {n:7,name:'Business Writing + LinkedIn',phase:'Month 2+',practice:'1 LinkedIn post/week. Under 15 words/sentence.',xp:40},
+  {n:8,name:'Financial Basics (GST, P&L)',phase:'Month 3+',practice:'Review costs vs income monthly. 1 CA question/month.',xp:40},
+  {n:9,name:'Network Building',phase:'Ongoing',practice:'5 LinkedIn connections/week with personal note.',xp:30},
+  {n:10,name:'Emotional Control + Focus',phase:'Ongoing',practice:'Journal 1 focus-loss moment per week.',xp:40},
+  {n:11,name:'Product Thinking',phase:'Ongoing',practice:'Talk to 1 factory owner before building anything new.',xp:50},
+  {n:12,name:'Deep Reading + Mental Models',phase:'Ongoing',practice:'20 pages minimum per day. 3 sentences per chapter.',xp:30},
+];
+
+const METRICS=[
+  {key:'factory',label:'Factory Talks',target:10,unit:'talks',xp:50},
+  {key:'badminton',label:'Badminton Sessions',target:6,unit:'sessions',xp:30},
+  {key:'english',label:'English Paragraphs',target:7,unit:'written',xp:20},
+  {key:'n8n',label:'n8n Build Sessions',target:3,unit:'sessions',xp:40},
+  {key:'linkedin',label:'LinkedIn Posts',target:1,unit:'posts',xp:30},
+  {key:'pages',label:'Pages Read',target:140,unit:'pages',xp:20},
+  {key:'sleep',label:'Avg Sleep',target:8.5,unit:'hrs',xp:10},
+  {key:'energy',label:'Avg Energy',target:7,unit:'/10',xp:10},
+];
+
+const ATTRS=[
+  {key:'badminton',label:'Badminton',icon:'🏸',color:'#5b7cfa'},
+  {key:'business',label:'Business',icon:'??',color:'#30c070'},
+  {key:'english',label:'English',icon:'✍️',color:'#f0a030'},
+  {key:'sleep',label:'Sleep',icon:'😴',color:'#9060e0'},
+  {key:'focus',label:'Focus',icon:'🧠',color:'#e04090'},
+];
+
+const REVIEW_QS=[
+  {s:'A — Numbers',q:'This Week\'s Numbers',hint:'Factory _ / target · Badminton _ / 6 · English _ / 7 · n8n _ / 3 · LinkedIn _ / 1 · Sleep _ hrs · Energy _ / 10 · Pages _ / 140',xp:50},
+  {s:'B — Badminton',q:'Shot Focus This Week',hint:'What was this week\'s shot focus? Did you actually improve it? Be specific.',xp:30},
+  {s:'',q:'Match Situation That Cost Most Points',hint:'Tactical or technical? The fix?',xp:30},
+  {s:'',q:'Next Week\'s Single Shot Focus',hint:'One shot only.',xp:20},
+  {s:'C — Business',q:'What Did You Ship?',hint:'n8n build, feature, post, outreach. If nothing — write why.',xp:50},
+  {s:'',q:'Factory Conversations',hint:'How many, with whom, what did you learn? Total _ / monthly target.',xp:40},
+  {s:'',q:'Biggest Blocker',hint:'Root cause, not symptom. One fix.',xp:30},
+  {s:'',q:'Most Important Task Next Week',hint:'One only. This becomes Tuesday\'s Power Block task.',xp:30},
+  {s:'D — Self',q:'English Every Day?',hint:'If not, which day broke — and why?',xp:20},
+  {s:'',q:'Growth Check',hint:'What can you say or write now that you could not one month ago?',xp:30},
+  {s:'',q:'Energy + Sleep + Injury',hint:'Energy _ · Sleep _ hrs · Injury flag _',xp:20},
+  {s:'E — Next Week',q:'The ONE Thing to Fix',hint:'Not five things. One.',xp:30},
+  {s:'',q:'Monday\'s Badminton Goal',hint:'Write it here. Transfer to morning paper.',xp:20},
+  {s:'',q:'Monday\'s Business Goal',hint:'Write it here. Transfer to morning paper.',xp:20},
+];
+
+const ACHS=[
+  {id:'first',icon:'⚔️',name:'First Quest',desc:'Complete your first quest',chk:s=>Object.values(s.cq).some(a=>a.length>0)},
+  {id:'power',icon:'⚡',name:'Power Activated',desc:'Complete a Power Day',chk:s=>['tue','thu'].some(d=>Object.keys(s.cq).some(k=>k.includes('_'+d)&&s.cq[k].length>=6))},
+  {id:'f1',icon:'🏭',name:'First Contact',desc:'Log first factory conversation',chk:s=>(s.wm.factory||0)>=1},
+  {id:'f5',icon:'🤝',name:'Prospector',desc:'5+ factory conversations',chk:s=>(s.wm.factory||0)>=5},
+  {id:'f10',icon:'📋',name:'Closer',desc:'10 factory conversations',chk:s=>(s.wm.factory||0)>=10},
+  {id:'eng',icon:'📝',name:'Daily Writer',desc:'7 English paragraphs in a week',chk:s=>(s.wm.english||0)>=7},
+  {id:'build',icon:'🛠️',name:'Builder',desc:'3 n8n sessions in a week',chk:s=>(s.wm.n8n||0)>=3},
+  {id:'rd',icon:'🟢',name:'D-Rank',desc:'Reach D Rank (1,000 XP)',chk:s=>s.xp>=1000},
+  {id:'rc',icon:'🔵',name:'C-Rank',desc:'Reach C Rank (5,000 XP)',chk:s=>s.xp>=5000},
+  {id:'rb',icon:'🟣',name:'B-Rank',desc:'Reach B Rank (15,000 XP)',chk:s=>s.xp>=15000},
+  {id:'review',icon:'📖',name:'Honest Reckoning',desc:'Complete Sunday Review',chk:s=>Object.keys(s.ra).length>=7},
+  {id:'lvl5',icon:'⬆️',name:'Rising',desc:'Reach Level 5',chk:s=>s.lvl>=5},
+  {id:'skill',icon:'🔮',name:'Skill Master',desc:'Max out a skill to 100%',chk:s=>Object.values(s.sp).some(v=>v>=100)},
+  {id:'pages',icon:'📚',name:'Voracious',desc:'Read 140 pages in a week',chk:s=>(s.wm.pages||0)>=140},
+];
+
+const RANKS=[
+  {min:0,l:'E',name:'Novice',desc:'Beginning of the journey. Every legend starts here.'},
+  {min:1000,l:'D',name:'Disciplined',desc:'Foundation forming. Consistency is your weapon.'},
+  {min:5000,l:'C',name:'Consistent',desc:'Discipline recognised. You are no longer ordinary.'},
+  {min:15000,l:'B',name:'Builder',desc:'Dangerous. Factory owners are starting to notice.'},
+  {min:35000,l:'A',name:'Operator',desc:'Elite. Few reach this. You understand sacrifice.'},
+  {min:75000,l:'S',name:'Elite',desc:'The system bows to your discipline.'},
+  {min:150000,l:'SS',name:'Shadow Monarch',desc:'You have become the thing others fear to face.'},
+];
+
+// ─────────────────────────────
+// STATE
+// ─────────────────────────────
+const SK='arjun_sl_v3';
+let S={xp:0,lvl:1,streak:0,lastDate:'',cq:{},wm:{},sp:{},achs:[],ra:{}};
+function load(){try{const d=localStorage.getItem(SK);if(d)S={...S,...JSON.parse(d)};}catch(e){}}
+function save(){localStorage.setItem(SK,JSON.stringify(S));refresh();}
+
+function getRank(){let r=RANKS[0];for(const rk of RANKS)if(S.xp>=rk.min)r=rk;return r;}
+function getNextRank(){for(const rk of RANKS)if(S.xp<rk.min)return rk;return RANKS[RANKS.length-1];}
+function getLvlXp(){return 1000*S.lvl;}
+
+function addXP(amt,msg){
+  if(!amt)return;
+  S.xp+=amt;
+  const today=new Date().toDateString();
+  if(S.lastDate!==today){S.streak++;S.lastDate=today;}
+  if(S.xp>=getLvlXp()*S.lvl&&S.lvl<20){S.lvl++;showLevelUp();}
+  checkAchs();
+  notify(msg,'+'+(amt)+' XP');
+  save();
+}
+
+function refresh(){
+  const r=getRank(),nr=getNextRank();
+  const today=new Date();
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('date-label').textContent=days[today.getDay()]+' '+today.getDate()+' '+months[today.getMonth()];
+  // header
+  const ra=document.getElementById('rank-avatar');
+  ra.textContent=r.l;ra.dataset.rank=r.l;
+  document.getElementById('streak-val').textContent=S.streak;
+  // xp bar
+  const needed=nr.min-r.min||1000;
+  const cur=S.xp-r.min;
+  const pct=Math.min(100,(cur/needed)*100);
+  document.getElementById('xp-bar').style.width=pct+'%';
+  document.getElementById('xp-val-display').textContent=S.xp.toLocaleString()+' / '+nr.min.toLocaleString()+' XP';
+  document.getElementById('rank-progress-text').textContent=r.l+' → '+nr.l;
+  // rank panel
+  const rb=document.getElementById('rank-big');
+  if(rb){rb.textContent=r.l;document.getElementById('rank-info-name').textContent=r.name;document.getElementById('rank-info-desc').textContent=r.desc;}
+  // stats
+  document.getElementById('total-xp-display').textContent=S.xp.toLocaleString();
+  document.getElementById('streak-stats').textContent=S.streak;
+  // attrs
+  renderAttrs();
+}
+
+// ─────────────────────────────
+// NOTIFICATIONS
+// ─────────────────────────────
+function notify(msg,xp=''){
+  const el=document.getElementById('notif');
+  document.getElementById('notif-msg').textContent=msg;
+  document.getElementById('notif-xp').textContent=xp;
+  el.style.display='block';clearTimeout(el._t);
+  el._t=setTimeout(()=>el.style.display='none',2600);
+}
+function showLevelUp(){
+  document.getElementById('lu-msg').textContent='Level '+S.lvl+' reached. You are growing stronger.';
+  document.getElementById('levelup').style.display='flex';
+}
+
+// ─────────────────────────────
+// TABS
+// ─────────────────────────────
+function showTab(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='stats'){renderAttrs();renderMetrics();}
+  if(id==='log'){renderLog();renderReview();}
+}
+
+// ─────────────────────────────
+// DAY / QUESTS
+// ─────────────────────────────
+let curDay='mon';
+function showDay(day,btn){
+  document.querySelectorAll('.day-chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');curDay=day;renderDay(day);
+}
+
+function getQKey(day,si,qi){
+  const today=new Date().toDateString();
+  return today+'_'+day+'_'+si+'_'+qi;
+}
+function isDone(day,si,qi){return !!(S.cq[getQKey(day,si,qi)]);}
+
+function renderDay(day){
+  const d=DAYS[day];
+  const isPower=d.power;
+  // power badge
+  document.getElementById('power-badge').style.display=isPower?'flex':'none';
+  // quest dots
+  let totalQ=0,doneQ=0;
+  d.sections.forEach((s,si)=>s.quests.forEach((q,qi)=>{totalQ++;if(isDone(day,si,qi))doneQ++;}));
+  const dotsEl=document.getElementById('quest-dots');
+  dotsEl.innerHTML='';
+  for(let i=0;i<totalQ;i++){const dot=document.createElement('div');dot.className='quest-dot'+(i<doneQ?' done':'');dotsEl.appendChild(dot);}
+  document.getElementById('quest-pct').textContent=totalQ?Math.round(doneQ/totalQ*100)+'%':'0%';
+
+  let h='';
+  if(isPower)h+=`<div class="power-alert"><div class="pa-icon">⚡</div><div class="pa-body"><div class="pa-title">Power Day — ${d.label}</div><div class="pa-sub">Badminton ends 12:30pm · Power Block 2:00–8:00pm · No evening gym</div></div></div>`;
+
+  d.sections.forEach((sec,si)=>{
+    h+=`<div class="section-head">${sec.head}</div>`;
+    sec.quests.forEach((q,qi)=>{
+      const done=isDone(day,si,qi);
+      const id=`q_${day}_${si}_${qi}`;
+      h+=`<div class="quest-item ${done?'done':''}" id="${id}" onclick="toggleExpand('${id}')">
+        <div class="quest-icon">${q.icon}</div>
+        <div class="quest-body">
+          <div class="quest-title">${q.title}</div>
+          ${q.detail?`<div class="quest-detail">${q.detail}${q.rule?`<div class="rule-banner">↳ ${q.rule}</div>`:''}</div>`:''}
+          <div class="quest-tags">${q.tags.map(t=>`<span class="quest-tag">${t}</span>`).join('')}</div>
+        </div>
+        <div class="quest-right">
+          <div class="quest-xp">+${q.xp}</div>
+          <div class="quest-circle" onclick="event.stopPropagation();completeQ('${day}',${si},${qi},${q.xp},'${q.title}')"><div class="quest-circle-check">✓</div></div>
+        </div>
+      </div>`;
+    });
+  });
+  document.getElementById('quest-list').innerHTML=h;
+}
+
+function toggleExpand(id){
+  const el=document.getElementById(id);
+  el.classList.toggle('expanded');
+}
+
+function completeQ(day,si,qi,xp,title){
+  const k=getQKey(day,si,qi);
+  if(S.cq[k]){delete S.cq[k];save();renderDay(day);return;}
+  S.cq[k]=true;
+  addXP(xp,title);
+  renderDay(day);
+}
+
+// ─────────────────────────────
+// ATTRS
+// ─────────────────────────────
+function getAttrXP(attrKey){
+  let total=0;
+  Object.keys(DAYS).forEach(day=>{
+    const d=DAYS[day];
+    d.sections.forEach((sec,si)=>sec.quests.forEach((q,qi)=>{
+      if(isDone(day,si,qi)&&q.tags.some(t=>t.toLowerCase()===attrKey.toLowerCase()))
+        total+=q.xp;
+    }));
+  });
+  return total;
+}
+
+function renderAttrs(){
+  const grid=document.getElementById('attrs-grid');
+  if(!grid)return;
+  grid.innerHTML=ATTRS.map(a=>{
+    const xp=getAttrXP(a.key);
+    const level=(xp/50).toFixed(1);
+    const pct=Math.min(100,(xp%500)/500*100);
+    return `<div class="attr-card">
+      <div class="attr-icon">${a.icon}</div>
+      <div class="attr-label">${a.label.toUpperCase()}</div>
+      <div class="attr-val" style="color:${a.color}">${level}</div>
+      <div class="attr-bar-bg"><div class="attr-bar-fill" style="width:${pct}%;background:${a.color}"></div></div>
+      <div class="attr-xp">${xp} / 500 stat XP</div>
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────
+// METRICS
+// ─────────────────────────────
+function renderMetrics(){
+  const grid=document.getElementById('metric-grid');
+  if(!grid)return;
+  grid.innerHTML=METRICS.map(m=>{
+    const val=S.wm[m.key]||0;
+    const pct=Math.min(100,val/m.target*100);
+    return `<div class="metric-card">
+      <div class="mc-label">${m.label}</div>
+      <div class="mc-val">${val}</div>
+      <div class="mc-target">Target: ${m.target} ${m.unit}</div>
+      <div class="mc-bar-bg"><div class="mc-bar-fill" style="width:${pct}%"></div></div>
+      <div class="mc-input-row">
+        <input class="mc-input" type="number" id="mc_${m.key}" value="${val}" min="0">
+        <button class="mc-btn" onclick="logMetric('${m.key}',${m.xp})">Log</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function logMetric(key,xp){
+  const el=document.getElementById('mc_'+key);
+  const val=parseFloat(el.value)||0;
+  const old=S.wm[key]||0;
+  S.wm[key]=val;
+  if(val>old)addXP(xp,'Metric: '+key);else save();
+  renderMetrics();
+}
+
+// ─────────────────────────────
+// LOG
+// ─────────────────────────────
+const DAY_KEYS=['mon','tue','wed','thu','fri','sat','sun'];
+const DAY_SHORTS=['M','T','W','T','F','S','S'];
+
+function getDayPct(dayKey,dateStr){
+  const d=DAYS[dayKey];let total=0,done=0;
+  d.sections.forEach((s,si)=>s.quests.forEach((q,qi)=>{
+    total++;
+    const k=dateStr+'_'+dayKey+'_'+si+'_'+qi;
+    if(S.cq[k])done++;
+  }));
+  return total?Math.round(done/total*100):0;
+}
+
+function renderLog(){
+  const today=new Date();
+  // week map — Mon to Sun of current week
+  const map=document.getElementById('week-map');
+  const dayOfWeek=today.getDay();
+  const monday=new Date(today);monday.setDate(today.getDate()-(dayOfWeek===0?6:dayOfWeek-1));
+  let mapH='';
+  for(let i=0;i<7;i++){
+    const d=new Date(monday);d.setDate(monday.getDate()+i);
+    const dk=DAY_KEYS[i];
+    const ds=d.toDateString();
+    const pct=getDayPct(dk,ds);
+    const isToday=ds===today.toDateString();
+    const opacity=0.1+pct/100*0.9;
+    mapH+=`<div class="wm-day">
+      <div class="wm-day-label">${DAY_SHORTS[i]}</div>
+      <div class="wm-day-box ${isToday?'today':''}" style="${pct>0?'background:rgba(91,124,250,'+opacity+');color:#fff':''}">${pct>0?pct+'%':'—'}</div>
+    </div>`;
+  }
+  map.innerHTML=mapH;
+
+  // last 7 days
+  const l7=document.getElementById('last7');
+  let l7H='';
+  for(let i=6;i>=0;i--){
+    const d=new Date(today);d.setDate(today.getDate()-i);
+    const ds=d.toDateString();
+    const isToday=i===0;
+    const dayIdx=d.getDay();
+    const dk=DAY_KEYS[dayIdx===0?6:dayIdx-1];
+    const pct=getDayPct(dk,ds);
+    const label=(isToday?'Today':['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()])+' '+d.getDate();
+    const icon=pct===100?'✅':pct>0?'🔥':'·';
+    l7H+=`<div class="last7-row">
+      <div class="last7-date ${isToday?'today':''}">${label}</div>
+      <div class="last7-bar-bg"><div class="last7-bar-fill" style="width:${pct}%"></div></div>
+      <div class="last7-pct">${pct}%</div>
+      <div class="last7-icon">${icon}</div>
+    </div>`;
+  }
+  l7.innerHTML=l7H;
+}
+
+// ─────────────────────────────
+// REVIEW
+// ─────────────────────────────
+function renderReview(){
+  const form=document.getElementById('review-form-log');
+  if(!form)return;
+  let h='';let lastS='';
+  REVIEW_QS.forEach((q,i)=>{
+    if(q.s&&q.s!==lastS){h+=`<div class="review-section-card"><div class="review-section-head"><div class="review-section-icon">📋</div><div class="review-section-title">${q.s}</div></div>`;lastS=q.s;}
+    else if(!q.s&&i>0&&REVIEW_QS[i-1].s){/* continue in card */}
+    const saved=S.ra[i]||'';
+    h+=`<div class="review-q-block">
+      <div class="review-q-label">Q${i+1} — ${q.q}<span>+${q.xp} XP</span></div>
+      <div class="review-hint">${q.hint}</div>
+      <textarea class="review-ta" id="rq${i}" placeholder="Write your answer...">${saved}</textarea>
+    </div>`;
+    // close card when section changes
+    const next=REVIEW_QS[i+1];
+    if(!next||(next.s&&next.s!==lastS))h+='</div>';
+  });
+  form.innerHTML=h;
+}
+function submitReview(){
+  let total=0,answered=0;
+  REVIEW_QS.forEach((q,i)=>{
+    const el=document.getElementById('rq'+i);
+    if(el&&el.value.trim().length>4){S.ra[i]=el.value;total+=q.xp;answered++;}
+  });
+  if(answered>0)addXP(total,'Sunday Review — '+answered+' questions');
+  else notify('Answer at least 1 question','');
+}
+
+// ─────────────────────────────
+// SKILLS
+// ─────────────────────────────
+function renderSkills(){
+  const list=document.getElementById('skill-list');
+  if(!list)return;
+  list.innerHTML=SKILLS.map((s,i)=>{
+    const p=S.sp[i]||0;
+    return `<div class="skill-card ${p>=100?'mastered':''}" onclick="trainSkill(${i})">
+      <div class="sk-num">${s.n}</div>
+      <div class="sk-body">
+        <div class="sk-name">${s.name}</div>
+        <div class="sk-phase">${s.phase}</div>
+        <div class="sk-practice">${s.practice}</div>
+        <div class="sk-bar-bg"><div class="sk-bar-fill" style="width:${p}%"></div></div>
+      </div>
+      <div class="sk-right">
+        <div class="sk-xp">+${Math.round(s.xp/10)} XP</div>
+        <div class="sk-pct">${p}%</div>
+        <div class="sk-tap">tap to train</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function trainSkill(i){
+  if(!S.sp[i])S.sp[i]=0;
+  S.sp[i]=Math.min(100,S.sp[i]+10);
+  addXP(Math.round(SKILLS[i].xp/10),'Trained: '+SKILLS[i].name);
+  renderSkills();
+}
+
+// ─────────────────────────────
+// ACHIEVEMENTS
+// ─────────────────────────────
+function checkAchs(){
+  ACHS.forEach(a=>{if(!S.achs.includes(a.id)&&a.chk(S)){S.achs.push(a.id);S.xp+=200;notify('Achievement: '+a.name,'+200 XP');}});
+}
+function renderAchs(){
+  const grid=document.getElementById('ach-grid');
+  if(!grid)return;
+  grid.innerHTML=ACHS.map(a=>`<div class="ach-card ${S.achs.includes(a.id)?'unlocked':''}">
+    <div class="ach-icon">${a.icon}</div>
+    <div class="ach-name">${a.name}</div>
+    <div class="ach-desc">${a.desc}</div>
+  </div>`).join('');
+}
+
+// ─────────────────────────────
+// MORE NAV
+// ─────────────────────────────
+function showMore(id,btn){
+  document.querySelectorAll('.more-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.more-chip').forEach(c=>c.classList.remove('active'));
+  document.getElementById('more-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='skills')renderSkills();
+  if(id==='rank'){renderAchs();refresh();}
+}
+
+// ─────────────────────────────
+// INIT
+// ─────────────────────────────
+load();
+renderDay('mon');
+refresh();
+
+// Auto-select today's day
+const todayIdx=new Date().getDay();
+const dayMap={0:'sun',1:'mon',2:'tue',3:'wed',4:'thu',5:'fri',6:'sat'};
+const todayKey=dayMap[todayIdx];
+const chips=document.querySelectorAll('.day-chip');
+chips.forEach(c=>c.classList.remove('active'));
+const idx={mon:0,tue:1,wed:2,thu:3,fri:4,sat:5,sun:6}[todayKey];
+if(chips[idx]){chips[idx].classList.add('active');renderDay(todayKey);}
+</script>
+
+<!-- NUTRITION PANEL -->
+<div class="panel" id="panel-nutrition">
+
+  <!-- Calorie ring + summary -->
+  <div class="nut-hero">
+    <div class="nut-ring-wrap">
+      <svg class="nut-ring" viewBox="0 0 120 120">
+        <circle class="ring-bg" cx="60" cy="60" r="50" fill="none" stroke-width="10"/>
+        <circle class="ring-fill" id="cal-ring" cx="60" cy="60" r="50" fill="none" stroke-width="10"
+          stroke-dasharray="314" stroke-dashoffset="314" stroke-linecap="round"/>
+      </svg>
+      <div class="nut-ring-center">
+        <div class="nut-ring-val" id="cal-consumed">0</div>
+        <div class="nut-ring-label">kcal</div>
+      </div>
+    </div>
+    <div class="nut-hero-info">
+      <div class="nut-target-row">
+        <span class="nut-target-label">TARGET</span>
+        <span class="nut-target-val">3,200 kcal</span>
+      </div>
+      <div class="nut-target-row">
+        <span class="nut-target-label">CONSUMED</span>
+        <span class="nut-target-val" id="cal-consumed-label" style="color:var(--accent)">0 kcal</span>
+      </div>
+      <div class="nut-target-row">
+        <span class="nut-target-label">REMAINING</span>
+        <span class="nut-target-val" id="cal-remaining" style="color:var(--green)">3,200 kcal</span>
+      </div>
+      <div class="nut-pct-badge" id="cal-pct-badge">0%</div>
+    </div>
+  </div>
+
+  <!-- Macro bars -->
+  <div class="section-head">Macros</div>
+  <div class="macro-card">
+    <div class="macro-row">
+      <div class="macro-info">
+        <span class="macro-name" style="color:#f0a030">PROTEIN</span>
+        <span class="macro-vals" id="prot-vals">0g / 150g</span>
+      </div>
+      <span class="macro-pct" id="prot-pct">0%</span>
+    </div>
+    <div class="macro-bar-bg"><div class="macro-bar-fill" id="prot-bar" style="background:#f0a030;width:0%"></div></div>
+
+    <div class="macro-row" style="margin-top:10px">
+      <div class="macro-info">
+        <span class="macro-name" style="color:#5b7cfa">CARBS</span>
+        <span class="macro-vals" id="carb-vals">0g / 400g</span>
+      </div>
+      <span class="macro-pct" id="carb-pct">0%</span>
+    </div>
+    <div class="macro-bar-bg"><div class="macro-bar-fill" id="carb-bar" style="background:#5b7cfa;width:0%"></div></div>
+
+    <div class="macro-row" style="margin-top:10px">
+      <div class="macro-info">
+        <span class="macro-name" style="color:#9060e0">FATS</span>
+        <span class="macro-vals" id="fat-vals">0g / 80g</span>
+      </div>
+      <span class="macro-pct" id="fat-pct">0%</span>
+    </div>
+    <div class="macro-bar-bg"><div class="macro-bar-fill" id="fat-bar" style="background:#9060e0;width:0%"></div></div>
+  </div>
+
+  <!-- Add food -->
+  <div class="section-head">Log Food</div>
+  <div class="add-food-card">
+    <div class="food-input-row">
+      <input class="food-input" id="food-name" type="text" placeholder="Food name (e.g. Rice + Dal)">
+    </div>
+    <div class="food-macro-row">
+      <div class="food-macro-field">
+        <label class="food-macro-label">Calories</label>
+        <input class="food-macro-input" id="food-cal" type="number" placeholder="kcal" min="0">
+      </div>
+      <div class="food-macro-field">
+        <label class="food-macro-label">Protein (g)</label>
+        <input class="food-macro-input" id="food-prot" type="number" placeholder="g" min="0">
+      </div>
+      <div class="food-macro-field">
+        <label class="food-macro-label">Carbs (g)</label>
+        <input class="food-macro-input" id="food-carb" type="number" placeholder="g" min="0">
+      </div>
+      <div class="food-macro-field">
+        <label class="food-macro-label">Fats (g)</label>
+        <input class="food-macro-input" id="food-fat" type="number" placeholder="g" min="0">
+      </div>
+    </div>
+    <div class="food-meal-row">
+      <select class="food-select" id="food-meal">
+        <option value="Pre-Gym">Pre-Gym</option>
+        <option value="Post-Outdoor">Post-Outdoor</option>
+        <option value="Pre-Badminton">Pre-Badminton</option>
+        <option value="Post-Badminton">Post-Badminton</option>
+        <option value="Dinner">Dinner</option>
+        <option value="Snack">Snack</option>
+      </select>
+      <button class="food-add-btn" onclick="addFood()">+ Add</button>
+    </div>
+  </div>
+
+  <!-- Meal log -->
+  <div class="section-head">Today's Meal Log</div>
+  <div id="meal-log-list"></div>
+
+  <!-- 7-day calorie trend -->
+  <div class="section-head">7-Day Calorie Trend</div>
+  <div class="trend-card">
+    <div class="trend-chart" id="trend-chart"></div>
+    <div class="trend-labels" id="trend-labels"></div>
+  </div>
+
+  <!-- Nutrition targets info -->
+  <div class="section-head">Daily Targets</div>
+  <div class="targets-card">
+    <div class="target-row"><span class="target-lbl">Calories</span><span class="target-val">3,200 kcal</span></div>
+    <div class="target-row"><span class="target-lbl">Protein</span><span class="target-val" style="color:#f0a030">150g</span></div>
+    <div class="target-row"><span class="target-lbl">Carbohydrates</span><span class="target-val" style="color:#5b7cfa">400g</span></div>
+    <div class="target-row"><span class="target-lbl">Fats</span><span class="target-val" style="color:#9060e0">80g</span></div>
+    <div class="target-row"><span class="target-lbl">Water</span><span class="target-val">3.5 L</span></div>
+    <div class="target-note">At ₹35L/month turnover, annual cost is 0.11% of one month's revenue. Your body is a more important asset.</div>
+  </div>
+
+</div>
+
+<style>
+/* ── NUTRITION STYLES ── */
+.nut-hero{display:flex;align-items:center;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin:16px 16px 0;}
+.nut-ring-wrap{position:relative;width:110px;height:110px;flex-shrink:0;}
+.nut-ring{width:110px;height:110px;transform:rotate(-90deg);}
+.ring-bg{stroke:var(--border2);}
+.ring-fill{stroke:var(--accent);transition:stroke-dashoffset .6s ease;}
+.nut-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.nut-ring-val{font-family:var(--mono);font-size:1.4rem;font-weight:700;color:var(--text);line-height:1;}
+.nut-ring-label{font-family:var(--mono);font-size:.55rem;color:var(--sub);letter-spacing:.1em;margin-top:2px;}
+.nut-hero-info{flex:1;}
+.nut-target-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.nut-target-label{font-family:var(--mono);font-size:.55rem;color:var(--sub);letter-spacing:.1em;text-transform:uppercase;}
+.nut-target-val{font-family:var(--mono);font-size:.7rem;font-weight:500;color:var(--text);}
+.nut-pct-badge{display:inline-block;margin-top:8px;background:rgba(91,124,250,.15);border:1px solid rgba(91,124,250,.3);color:var(--accent);font-family:var(--mono);font-size:.65rem;padding:3px 10px;border-radius:10px;}
+
+.macro-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:0 16px 8px;}
+.macro-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.macro-info{display:flex;align-items:center;gap:8px;}
+.macro-name{font-family:var(--mono);font-size:.65rem;font-weight:700;letter-spacing:.1em;}
+.macro-vals{font-family:var(--mono);font-size:.62rem;color:var(--sub);}
+.macro-pct{font-family:var(--mono);font-size:.65rem;color:var(--sub);}
+.macro-bar-bg{height:6px;background:var(--border2);border-radius:3px;overflow:hidden;}
+.macro-bar-fill{height:100%;border-radius:3px;transition:width .5s ease;}
+
+.add-food-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:0 16px 8px;}
+.food-input-row{margin-bottom:10px;}
+.food-input{width:100%;background:var(--card2);border:1px solid var(--border2);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:.85rem;padding:9px 12px;border-radius:8px;outline:none;transition:border-color .15s;}
+.food-input:focus{border-color:var(--accent2);}
+.food-macro-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:10px;}
+.food-macro-field{display:flex;flex-direction:column;gap:3px;}
+.food-macro-label{font-family:var(--mono);font-size:.5rem;color:var(--sub);text-transform:uppercase;letter-spacing:.08em;}
+.food-macro-input{background:var(--card2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:.75rem;padding:7px 8px;border-radius:6px;outline:none;width:100%;transition:border-color .15s;}
+.food-macro-input:focus{border-color:var(--accent2);}
+.food-meal-row{display:flex;gap:8px;}
+.food-select{flex:1;background:var(--card2);border:1px solid var(--border2);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:.8rem;padding:7px 10px;border-radius:8px;outline:none;cursor:pointer;}
+.food-add-btn{background:var(--accent2);border:none;color:#fff;font-family:var(--mono);font-size:.7rem;font-weight:700;letter-spacing:.08em;padding:8px 18px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:opacity .15s;}
+.food-add-btn:hover{opacity:.85;}
+
+.meal-entry{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 14px;margin:0 16px 6px;display:flex;align-items:center;gap:10px;}
+.meal-entry-dot{width:3px;height:36px;border-radius:2px;flex-shrink:0;}
+.meal-entry-body{flex:1;min-width:0;}
+.meal-entry-type{font-family:var(--mono);font-size:.55rem;color:var(--sub);text-transform:uppercase;letter-spacing:.1em;}
+.meal-entry-name{font-size:.82rem;font-weight:600;color:var(--text);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.meal-entry-macros{font-family:var(--mono);font-size:.58rem;color:var(--sub);margin-top:3px;}
+.meal-entry-cal{font-family:var(--mono);font-size:.75rem;font-weight:700;color:var(--accent);flex-shrink:0;}
+.meal-entry-del{background:none;border:none;color:var(--sub2);cursor:pointer;font-size:.9rem;padding:2px 4px;flex-shrink:0;transition:color .15s;}
+.meal-entry-del:hover{color:var(--red);}
+.meal-empty{text-align:center;padding:24px;font-family:var(--mono);font-size:.65rem;color:var(--sub2);margin:0 16px;}
+
+.trend-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:0 16px 8px;}
+.trend-chart{display:flex;align-items:flex-end;gap:6px;height:70px;}
+.trend-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;}
+.trend-bar{width:100%;border-radius:3px 3px 0 0;min-height:3px;background:var(--accent2);opacity:.6;transition:all .4s ease;}
+.trend-bar.today{opacity:1;background:var(--accent);}
+.trend-val{font-family:var(--mono);font-size:.45rem;color:var(--sub2);}
+.trend-labels{display:flex;gap:6px;margin-top:6px;}
+.trend-day-label{flex:1;text-align:center;font-family:var(--mono);font-size:.52rem;color:var(--sub);text-transform:uppercase;}
+.trend-day-label.today{color:var(--accent);}
+
+.targets-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:0 16px 24px;}
+.target-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);}
+.target-row:last-of-type{border-bottom:none;}
+.target-lbl{font-family:var(--mono);font-size:.65rem;color:var(--sub);text-transform:uppercase;letter-spacing:.08em;}
+.target-val{font-family:var(--mono);font-size:.68rem;font-weight:500;color:var(--text);}
+.target-note{font-size:.68rem;color:var(--sub2);line-height:1.5;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+
+/* fix panel padding for nutrition */
+#panel-nutrition{padding:0 0 24px;}
+#panel-nutrition .section-head{padding:0 16px;margin:14px 0 8px;}
+</style>
+
+<script>
+// ── NUTRITION STATE & TARGETS ──
+const NUT_TARGETS={cal:3200,prot:150,carb:400,fat:80};
+const MEAL_COLORS=['#5b7cfa','#30c070','#f0a030','#9060e0','#e04090','#f07030'];
+
+function getNutKey(){return 'nut_'+new Date().toDateString();}
+function getNutHistory(){
+  try{return JSON.parse(localStorage.getItem('nut_history')||'{}');}catch(e){return {};}
+}
+function saveNutHistory(h){localStorage.setItem('nut_history',JSON.stringify(h));}
+
+function getTodayFoods(){
+  try{return JSON.parse(localStorage.getItem(getNutKey())||'[]');}catch(e){return[];}
+}
+function saveTodayFoods(foods){
+  // also save daily total to history
+  const total=foods.reduce((a,f)=>a+f.cal,0);
+  const h=getNutHistory();
+  h[new Date().toDateString()]=total;
+  saveNutHistory(h);
+  localStorage.setItem(getNutKey(),JSON.stringify(foods));
+}
+
+function addFood(){
+  const name=document.getElementById('food-name').value.trim();
+  const cal=parseFloat(document.getElementById('food-cal').value)||0;
+  const prot=parseFloat(document.getElementById('food-prot').value)||0;
+  const carb=parseFloat(document.getElementById('food-carb').value)||0;
+  const fat=parseFloat(document.getElementById('food-fat').value)||0;
+  const meal=document.getElementById('food-meal').value;
+  if(!name||cal<=0){notify('Enter food name and calories','');return;}
+  const foods=getTodayFoods();
+  foods.push({name,cal,prot,carb,fat,meal,time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})});
+  saveTodayFoods(foods);
+  // clear inputs
+  ['food-name','food-cal','food-prot','food-carb','food-fat'].forEach(id=>document.getElementById(id).value='');
+  renderNutrition();
+  // XP for logging food
+  addXP(5,'Meal logged: '+name);
+}
+
+function deleteFood(idx){
+  const foods=getTodayFoods();
+  foods.splice(idx,1);
+  saveTodayFoods(foods);
+  renderNutrition();
+}
+
+function renderNutrition(){
+  const foods=getTodayFoods();
+  const totals=foods.reduce((a,f)=>({cal:a.cal+f.cal,prot:a.prot+f.prot,carb:a.carb+f.carb,fat:a.fat+f.fat}),{cal:0,prot:0,carb:0,fat:0});
+
+  // ring
+  const calPct=Math.min(100,totals.cal/NUT_TARGETS.cal*100);
+  const circumference=314;
+  const offset=circumference-(calPct/100*circumference);
+  document.getElementById('cal-ring').style.strokeDashoffset=offset;
+  document.getElementById('cal-consumed').textContent=Math.round(totals.cal).toLocaleString();
+  document.getElementById('cal-consumed-label').textContent=Math.round(totals.cal).toLocaleString()+' kcal';
+  document.getElementById('cal-remaining').textContent=Math.max(0,NUT_TARGETS.cal-Math.round(totals.cal)).toLocaleString()+' kcal';
+  document.getElementById('cal-pct-badge').textContent=Math.round(calPct)+'%';
+  // ring colour by completion
+  const ringEl=document.getElementById('cal-ring');
+  if(calPct>=100)ringEl.style.stroke='#30c070';
+  else if(calPct>=70)ringEl.style.stroke='#5b7cfa';
+  else ringEl.style.stroke='#5b7cfa';
+
+  // macros
+  const macros=[
+    {key:'prot',total:totals.prot,target:NUT_TARGETS.prot,barId:'prot-bar',pctId:'prot-pct',valsId:'prot-vals'},
+    {key:'carb',total:totals.carb,target:NUT_TARGETS.carb,barId:'carb-bar',pctId:'carb-pct',valsId:'carb-vals'},
+    {key:'fat',total:totals.fat,target:NUT_TARGETS.fat,barId:'fat-bar',pctId:'fat-pct',valsId:'fat-vals'},
+  ];
+  macros.forEach(m=>{
+    const p=Math.min(100,m.total/m.target*100);
+    document.getElementById(m.barId).style.width=p+'%';
+    document.getElementById(m.pctId).textContent=Math.round(p)+'%';
+    document.getElementById(m.valsId).textContent=Math.round(m.total)+'g / '+m.target+'g';
+  });
+
+  // meal log
+  const logEl=document.getElementById('meal-log-list');
+  if(!foods.length){logEl.innerHTML='<div class="meal-empty">No meals logged yet today.<br>Add your first meal above.</div>';return;}
+  const mealOrder=['Pre-Gym','Post-Outdoor','Pre-Badminton','Post-Badminton','Dinner','Snack'];
+  let html='';
+  foods.forEach((f,i)=>{
+    const ci=mealOrder.indexOf(f.meal)%MEAL_COLORS.length;
+    const color=MEAL_COLORS[Math.max(0,ci)];
+    html+=`<div class="meal-entry">
+      <div class="meal-entry-dot" style="background:${color}"></div>
+      <div class="meal-entry-body">
+        <div class="meal-entry-type">${f.meal} · ${f.time}</div>
+        <div class="meal-entry-name">${f.name}</div>
+        <div class="meal-entry-macros">P:${f.prot}g &nbsp;C:${f.carb}g &nbsp;F:${f.fat}g</div>
+      </div>
+      <div class="meal-entry-cal">${Math.round(f.cal)} kcal</div>
+      <button class="meal-entry-del" onclick="deleteFood(${i})">✕</button>
+    </div>`;
+  });
+  logEl.innerHTML=html;
+
+  // trend chart
+  renderTrend();
+}
+
+function renderTrend(){
+  const h=getNutHistory();
+  const today=new Date();
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let chartH='';let labH='';
+  const maxCal=Math.max(NUT_TARGETS.cal,...Object.values(h).map(Number));
+
+  for(let i=6;i>=0;i--){
+    const d=new Date(today);d.setDate(today.getDate()-i);
+    const ds=d.toDateString();
+    const isToday=i===0;
+    const cal=h[ds]||0;
+    const heightPct=cal?Math.max(5,cal/maxCal*100):5;
+    const opacity=cal?1:.2;
+    chartH+=`<div class="trend-bar-wrap">
+      <div class="trend-val">${cal>0?(cal>999?Math.round(cal/100)/10+'k':Math.round(cal)):''}</div>
+      <div class="trend-bar ${isToday?'today':''}" style="height:${heightPct}%;opacity:${opacity}"></div>
+    </div>`;
+    labH+=`<div class="trend-day-label ${isToday?'today':''}">${days[d.getDay()]}</div>`;
+  }
+  document.getElementById('trend-chart').innerHTML=chartH;
+  document.getElementById('trend-labels').innerHTML=labH;
+}
+
+// Hook nutrition into showTab
+const _origShowTab=window.showTab;
+window.showTab=function(id,btn){
+  _origShowTab(id,btn);
+  if(id==='nutrition')renderNutrition();
+};
+
+// Init nutrition if panel is loaded
+document.addEventListener('DOMContentLoaded',()=>{},false);
+// render on first visit if already on nutrition tab
+if(document.getElementById('panel-nutrition').classList.contains('active'))renderNutrition();
+</script>
+
+</body>
+</html>
